@@ -1,73 +1,3 @@
-
-
-data = importdata("denoising_codeChallenge.mat");
-
-origSignal = data.origSignal;
-cleanedSignal = data.cleanedSignal;
-
-figure(1)
-
-plot(origSignal, 'b')
-
-% plot(cleanedSignal)
-k = 130;
-
-% Running mean time series filter
-coefficient = ((2*k+1)^-1);
-meanSignal = origSignal;
-for i=k+1:length(origSignal)-k-1
- 
-    meanSignal(i) = mean(meanSignal(i-k: i+k));
-end
-
-% Setting the edges to zero
-
-figure(2)
-plot(meanSignal,'r')
-ylim([-1 0.7])
-% Remove spike noise using the median filter
-threshold = 70;
-
-% get values above the threshold
-aboveThresh = find(meanSignal>threshold);
-
-% initialise median filtered signal
-medianSignal = origSignal;
-
-for i=1:length(aboveThresh)
-    lowerBound = max(1, aboveThresh(i)-k);
-    upperBound = min(aboveThresh(i)+ k, length(meanSignal));
-    
-    % calculate median of the surrounding points
-    medianSignal(aboveThresh(i)) = median(meanSignal(lowerBound:upperBound));
-    
-end
-
-medianSignal = filter(medianSignal);
-
-
-figure(3)
-plot(medianSignal,'k')
-ylim([-1 0.7])
-
-figure(4)
-plot(dtrend(medianSignal))
-ylim([-1 0.7])
-
-% for i=k+1:length(origSignal)-k-1
-%  
-%     origSignal(i) = median(origSignal(i-k: i+k));
-% end
-% 
-% hold on
-% plot(origSignal,'k')
-% 
-% for i=2:length(origSignal)-1
-%     origSignal(i) = (origSignal(i)^2) - (origSignal(i-1)*origSignal(i+1));
-% end
-% 
-% hold on
-% plot(origSignal,'k')
 clear;clc;
 data = importdata("denoising_codeChallenge.mat");
 
@@ -77,6 +7,9 @@ cleanedSignal = data.cleanedSignal;
 figure;
 
 plot(origSignal, 'b')
+title('Original Signal')
+xlabel('time')
+ylabel('amplitude')
 
 k = 150;
 % Remove spike noise using the median filter
@@ -96,8 +29,7 @@ for i=1:length(aboveThresh)
     upperBound = min(aboveThresh(i)+ k, length(medianSignal));
     
     % calculate median of the surrounding points
-    medianSignal(aboveThresh(i)) = 
-median(medianSignal(lowerBound:upperBound));
+    medianSignal(aboveThresh(i)) = median(medianSignal(lowerBound:upperBound));
     
 end
 
@@ -107,12 +39,14 @@ for i=1:length(aboveThresh)
     upperBound = min(aboveThresh(i)+ k, length(medianSignal));
     
     % calculate median of the surrounding points
-    medianSignal(belowThresh(i)) = 
-median(medianSignal(lowerBound:upperBound));
+    medianSignal(belowThresh(i)) = median(medianSignal(lowerBound:upperBound));
     
 end
 figure;
 plot(medianSignal,'g')
+title('median filter with k = 150')
+xlabel('time')
+ylabel('amp[litude')
 %ylim([-3 3])
 
 
@@ -131,4 +65,7 @@ end
 
 figure;
 plot(meanSignal,'r')
+title('cascaded output through mean timeseries filter with k = 150')
+xlabel('time')
+ylabel('amplitude')
 ylim([-1 1])
